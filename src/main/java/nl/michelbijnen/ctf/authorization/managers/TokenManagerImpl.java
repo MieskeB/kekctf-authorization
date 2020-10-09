@@ -11,6 +11,7 @@ import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import nl.michelbijnen.ctf.authorization.errors.InvalidTokenException;
+import nl.michelbijnen.ctf.authorization.models.CheckTokenResponse;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -18,6 +19,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Component("TokenManager")
@@ -30,7 +32,7 @@ public class TokenManagerImpl implements TokenManager {
     }
 
     @Override
-    public String issueToken(String userId) {
+    public String issueToken(String userId, List<String> roles) {
         try {
             Date expirationDate = Date.from(Instant.now().plus(1, ChronoUnit.DAYS));
 
@@ -40,7 +42,7 @@ public class TokenManagerImpl implements TokenManager {
             signedJWT.sign(signer);
             String token = signedJWT.serialize();
             return token;
-        } catch (Exception ex){
+        } catch (Exception ex) {
             return null;
         }
     }
@@ -52,17 +54,23 @@ public class TokenManagerImpl implements TokenManager {
             RSAPublicKey publicKey = key.toRSAPublicKey();
             JWSVerifier verifier = new RSASSAVerifier(publicKey);
             boolean success = signedJWT.verify(verifier);
-            if (success){
+            if (success) {
                 Date expirationDate = signedJWT.getJWTClaimsSet().getExpirationTime();
                 if (expirationDate.before(Date.from(Instant.now()))) {
                     return Mono.error(InvalidTokenException::new);
                 }
                 String userId = signedJWT.getJWTClaimsSet().getSubject();
+//                Object authorities = signedJWT.getJWTClaimsSet().getClaim("authorities");
+//                if (!(authorities instanceof List)) {
+//                    return Mono.error(InvalidTokenException::new);
+//                }
+//                List<String> roles = (List<String>) authorities;
+
                 return Mono.just(userId);
             } else {
                 return Mono.error(InvalidTokenException::new);
             }
-        } catch (Exception ex){
+        } catch (Exception ex) {
             return Mono.error(InvalidTokenException::new);
         }
     }

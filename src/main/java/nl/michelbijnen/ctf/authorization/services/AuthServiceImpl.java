@@ -46,8 +46,9 @@ public class AuthServiceImpl implements AuthService {
         } else {
             team = databaseTeamList.get(0);
         }
-
-        User user = new User(UUID.randomUUID().toString(), username, team, hash, salt, secret);
+        List<String> roles = new ArrayList<>();
+        roles.add("ROLE_USER");
+        User user = new User(UUID.randomUUID().toString(), username, team, hash, salt, secret, roles);
 
         List<User> optionalUser = this.userRepository.findByUsername(username);
         if (optionalUser.size() >= 1) {
@@ -59,7 +60,7 @@ public class AuthServiceImpl implements AuthService {
         this.logger.info("User with username '" + username + "' created an account");
 
         String userId = user.getId();
-        String token = this.tokenManager.issueToken(userId);
+        String token = this.tokenManager.issueToken(userId, user.getRoles());
         SignupResponse signupResponse = new SignupResponse(userId, token, secret);
         return Mono.just(signupResponse);
     }
@@ -87,7 +88,7 @@ public class AuthServiceImpl implements AuthService {
             if (codeMatched) {
                 this.logger.info("User with username '" + username + "' logged in");
 
-                String token = this.tokenManager.issueToken(user.getId());
+                String token = this.tokenManager.issueToken(user.getId(), user.getRoles());
                 LoginResponse loginResponse = new LoginResponse();
                 loginResponse.setToken(token);
                 loginResponse.setUserId(user.getId());

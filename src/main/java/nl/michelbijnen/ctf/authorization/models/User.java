@@ -4,10 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.CascadeType;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -23,4 +24,6 @@ public class User {
     private String hash;
     private String salt;
     private String secretKey;
+    @ElementCollection
+    private List<String> roles;
 }
