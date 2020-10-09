@@ -42,6 +42,7 @@ public class AuthServiceImpl implements AuthService {
         Team team;
         if (databaseTeamList.size() == 0) {
             team = new Team(UUID.randomUUID().toString(), teamName, new ArrayList<>());
+            this.teamRepository.save(team);
         } else {
             team = databaseTeamList.get(0);
         }
