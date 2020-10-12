@@ -11,7 +11,8 @@ import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import nl.michelbijnen.ctf.authorization.errors.InvalidTokenException;
-import nl.michelbijnen.ctf.authorization.models.CheckTokenResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -24,6 +25,7 @@ import java.util.UUID;
 
 @Component("TokenManager")
 public class TokenManagerImpl implements TokenManager {
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private RSAKey key;
 
@@ -32,12 +34,19 @@ public class TokenManagerImpl implements TokenManager {
     }
 
     @Override
-    public String issueToken(String userId, List<String> roles) {
+    public String issueToken(String userId, String role) {
         try {
             Date expirationDate = Date.from(Instant.now().plus(1, ChronoUnit.DAYS));
 
             JWSSigner signer = new RSASSASigner(key);
-            JWTClaimsSet cs = new JWTClaimsSet.Builder().subject(userId).expirationTime(expirationDate).build();
+
+            JWTClaimsSet.Builder csBuilder = new JWTClaimsSet.Builder();
+            csBuilder.subject(userId);
+            csBuilder.expirationTime(expirationDate);
+            csBuilder.claim("role", role);
+            csBuilder.getClaims().forEach((key, value) -> this.logger.debug(key + " " + value));
+            JWTClaimsSet cs = csBuilder.build();
+
             SignedJWT signedJWT = new SignedJWT(new JWSHeader.Builder(JWSAlgorithm.RS256).keyID(key.getKeyID()).build(), cs);
             signedJWT.sign(signer);
             String token = signedJWT.serialize();

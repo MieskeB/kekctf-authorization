@@ -1,13 +1,10 @@
 package nl.michelbijnen.ctf.authorization.managers;
 
-import nl.michelbijnen.ctf.authorization.models.CheckTokenResponse;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
 
 public interface TokenManager {
 
-    String issueToken(String userId, List<String> roles);
+    String issueToken(String userId, String role);
 
     Mono<String> parse(String token);
 }
