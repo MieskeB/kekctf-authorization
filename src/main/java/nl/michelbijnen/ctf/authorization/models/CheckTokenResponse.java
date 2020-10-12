@@ -7,4 +7,5 @@ import lombok.Data;
 @AllArgsConstructor
 public class CheckTokenResponse {
     private String userId;
+    private String role;
 }

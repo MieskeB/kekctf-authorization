@@ -103,11 +103,12 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public Mono<CheckTokenResponse> checkToken(CheckTokenRequest request) {
         this.logger.debug("Checking token " + request.getToken());
-        return Mono.just(new CheckTokenResponse(this.tokenManager.parse(request.getToken()).block()));
+        return this.tokenManager.parse(request.getToken());
     }
 
     @Override
     public Mono<String> parseToken(String token) {
-        return tokenManager.parse(token);
+//        return tokenManager.parse(token);
+        return null;
     }
 }

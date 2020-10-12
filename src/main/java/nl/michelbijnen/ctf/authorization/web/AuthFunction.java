@@ -19,13 +19,14 @@ public class AuthFunction implements HandlerFilterFunction<ServerResponse, Serve
     @Override
     public Mono<ServerResponse> filter(ServerRequest request,
                                        HandlerFunction<ServerResponse> handlerFunction) {
-        List<String> headers = request.headers().header("Authorization");
-        if (headers.isEmpty()) return ServerResponse.status(403).build();
-
-        String token = headers.get(0);
-
-        return authService.parseToken(token)
-                .flatMap(res -> handlerFunction.handle(request))
-                .onErrorResume(err -> ServerResponse.status(403).build());
+//        List<String> headers = request.headers().header("Authorization");
+//        if (headers.isEmpty()) return ServerResponse.status(403).build();
+//
+//        String token = headers.get(0);
+//
+//        return authService.parseToken(token)
+//                .flatMap(res -> handlerFunction.handle(request))
+//                .onErrorResume(err -> ServerResponse.status(403).build());
+        return null;
     }
 }

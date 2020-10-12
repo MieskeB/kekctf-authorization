@@ -24,7 +24,7 @@ public class Router {
     public RouterFunction<ServerResponse> protectedEndpoint (AuthHandler handler,
                                                              AuthFunction authFunction){
         return RouterFunctions
-                .route(POST("/checktoken").and(accept(json)), handler::checkToken)
-                .filter(authFunction::filter);
+                .route(POST("/checktoken").and(accept(json)), handler::checkToken);
+//                .filter(authFunction::filter);
     }
 }

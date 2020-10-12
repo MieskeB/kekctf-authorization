@@ -11,6 +11,7 @@ import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import nl.michelbijnen.ctf.authorization.errors.InvalidTokenException;
+import nl.michelbijnen.ctf.authorization.models.CheckTokenResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -57,7 +58,7 @@ public class TokenManagerImpl implements TokenManager {
     }
 
     @Override
-    public Mono<String> parse(String token) {
+    public Mono<CheckTokenResponse> parse(String token) {
         try {
             SignedJWT signedJWT = SignedJWT.parse(token);
             RSAPublicKey publicKey = key.toRSAPublicKey();
@@ -68,14 +69,17 @@ public class TokenManagerImpl implements TokenManager {
                 if (expirationDate.before(Date.from(Instant.now()))) {
                     return Mono.error(InvalidTokenException::new);
                 }
-                String userId = signedJWT.getJWTClaimsSet().getSubject();
+                JWTClaimsSet claimsSet = signedJWT.getJWTClaimsSet();
+                String userId = claimsSet.getSubject();
+                String role = claimsSet.getClaim("role").toString();
+
 //                Object authorities = signedJWT.getJWTClaimsSet().getClaim("authorities");
 //                if (!(authorities instanceof List)) {
 //                    return Mono.error(InvalidTokenException::new);
 //                }
 //                List<String> roles = (List<String>) authorities;
 
-                return Mono.just(userId);
+                return Mono.just(new CheckTokenResponse(userId, role));
             } else {
                 return Mono.error(InvalidTokenException::new);
             }
