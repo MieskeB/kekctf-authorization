@@ -16,6 +16,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Component("AuthService")
@@ -48,8 +49,8 @@ public class AuthServiceImpl implements AuthService {
         }
         User user = new User(UUID.randomUUID().toString(), username, team, hash, salt, secret, "ROLE_USER");
 
-        List<User> optionalUser = this.userRepository.findByUsername(username);
-        if (optionalUser.size() >= 1) {
+        Optional<User> optionalUser = this.userRepository.findUserByUsername(username);
+        if (!optionalUser.isPresent()) {
             this.logger.warn("User with username '" + username + "' tried creating an account, but he already has an account");
             return Mono.error(new AlreadyExistsException());
         }
@@ -69,13 +70,13 @@ public class AuthServiceImpl implements AuthService {
         String password = request.getPassword();
         String code = request.getCode();
 
-        List<User> optionalUser = this.userRepository.findByUsername(username);
-        if (optionalUser.size() < 1) {
+        Optional<User> optionalUser = this.userRepository.findUserByUsername(username);
+        if (!optionalUser.isPresent()) {
             this.logger.warn("User with username '" + username + "' tried to log in but he does not exist");
             return Mono.error(new LoginDeniedException());
         }
 
-        User user = optionalUser.get(0);
+        User user = optionalUser.get();
 
         String salt = user.getSalt();
         String secret = user.getSecretKey();
