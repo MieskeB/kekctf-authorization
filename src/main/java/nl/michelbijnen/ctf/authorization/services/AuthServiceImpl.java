@@ -90,6 +90,7 @@ public class AuthServiceImpl implements AuthService {
                 LoginResponse loginResponse = new LoginResponse();
                 loginResponse.setToken(token);
                 loginResponse.setUserId(user.getId());
+                loginResponse.setRole(user.getRole());
                 return Mono.just(loginResponse);
             } else {
                 this.logger.warn("User with username '" + username + "' tried to log in with wrong 2fa code");
