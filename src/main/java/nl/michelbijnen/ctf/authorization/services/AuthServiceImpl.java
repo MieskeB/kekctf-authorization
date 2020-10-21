@@ -50,7 +50,7 @@ public class AuthServiceImpl implements AuthService {
         User user = new User(UUID.randomUUID().toString(), username, team, hash, salt, secret, "ROLE_USER");
 
         Optional<User> optionalUser = this.userRepository.findUserByUsername(username);
-        if (!optionalUser.isPresent()) {
+        if (optionalUser.isPresent()) {
             this.logger.warn("User with username '" + username + "' tried creating an account, but he already has an account");
             return Mono.error(new AlreadyExistsException());
         }
