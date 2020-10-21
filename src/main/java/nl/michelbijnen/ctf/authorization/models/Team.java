@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import org.checkerframework.common.aliasing.qual.Unique;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import java.util.List;
@@ -19,6 +20,6 @@ public class Team {
     private String id;
     @Unique
     private String name;
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<Challenge> solvedChallenges;
 }

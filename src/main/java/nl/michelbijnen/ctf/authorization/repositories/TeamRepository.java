@@ -6,9 +6,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface TeamRepository extends JpaRepository<Team, String> {
-    @Query("FROM Team t WHERE t.name = ?1")
-    List<Team> findByTeamName(String teamName);
+    Optional<Team> findTeamByName(String teamName);
 }

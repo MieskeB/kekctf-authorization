@@ -39,13 +39,13 @@ public class AuthServiceImpl implements AuthService {
         String hash = BCrypt.hashpw(password, salt);
         String secret = this.totpManager.generateSecret();
 
-        List<Team> databaseTeamList = this.teamRepository.findByTeamName(teamName);
+        Optional<Team> databaseTeamList = this.teamRepository.findTeamByName(teamName);
         Team team;
-        if (databaseTeamList.size() == 0) {
+        if (!databaseTeamList.isPresent()) {
             team = new Team(UUID.randomUUID().toString(), teamName, new ArrayList<>());
             this.teamRepository.save(team);
         } else {
-            team = databaseTeamList.get(0);
+            team = databaseTeamList.get();
         }
         User user = new User(UUID.randomUUID().toString(), username, team, hash, salt, secret, "ROLE_USER");
 
